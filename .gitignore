@@ -1,4 +1,5 @@
 #Project local properties
+/.settings/
 .classpath
 .project
 # Compiled class file

@@ -3,6 +3,9 @@ package reflexivity;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Reflex {
 
@@ -16,13 +19,29 @@ public class Reflex {
 		String className = null;
 		String output = null;
 		PrintStream print = null;
-		String error;
+		String error = null;
 		try {
 			className = args[0];
 			output = args[1];
-			Class clazz = Class.forName(className);
+			Class<?> clazz = Class.forName(className);
 			File file = new File(output);
 			print = new PrintStream(file);
+			print.print(Modifier.toString(clazz.getModifiers()));
+			print.print(" ");
+			print.print(clazz.getCanonicalName());
+			Class<?> sup = clazz.getSuperclass();
+			if (sup != null) {
+				print.print(" extends ");
+				print.print(sup.getCanonicalName());
+			}
+			Class<?>[] interfaces = clazz.getInterfaces();
+			if (interfaces != null && interfaces.length != 0) {
+				print.print(" implements ");
+				print.print(Arrays.asList(interfaces).stream().map(e -> e.getCanonicalName())
+						.collect(Collectors.joining(", ")));
+			}
+			print.println("{");
+			print.print("}");
 		} catch (ClassNotFoundException e) {
 			if (className == null) {
 				error = MISS_CLASS_NAME;
@@ -30,18 +49,26 @@ public class Reflex {
 				error = String.format(CLASS_NAME_INVALID, new Object[] { className });
 			}
 		} catch (FileNotFoundException | SecurityException e) {
-
+			if (output == null) {
+				error = MISS_OUTPUT;
+			} else {
+				error = String.format(OUTPUT_UNUSABLE, output, e.getMessage());
+			}
 		} catch (Exception e) {
 			if (className == null) {
 				error = MISS_CLASS_NAME;
 			} else if (output == null) {
 				error = MISS_OUTPUT;
+			} else {
+				error = e.getMessage();
 			}
-			System.err.println(error);
 		} finally {
 			if (print != null) {
 				print.close();
 			}
+		}
+		if (error != null) {
+			System.err.println(error);
 		}
 	}
 
