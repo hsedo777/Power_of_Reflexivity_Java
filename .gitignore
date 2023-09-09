@@ -1,4 +1,8 @@
+#Project local properties
+.classpath
+.project
 # Compiled class file
+/bin/
 *.class
 
 # Log file
