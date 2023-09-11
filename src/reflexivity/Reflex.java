@@ -3,6 +3,7 @@ package reflexivity;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -41,6 +42,18 @@ public class Reflex {
 						.collect(Collectors.joining(", ")));
 			}
 			print.println("{");
+			Field[] fields = clazz.getDeclaredFields();
+			if(fields != null && fields.length != 0) {
+				print.println();
+				for(Field f : fields) {
+					print.print(Modifier.toString(f.getModifiers()));
+					print.print(" ");
+					print.print(f.getType().getCanonicalName());
+					print.print(" ");
+					print.print(f.getName());
+					print.println();
+				}
+			}
 			print.print("}");
 		} catch (ClassNotFoundException e) {
 			if (className == null) {
