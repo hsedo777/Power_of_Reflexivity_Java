@@ -3,7 +3,9 @@ package reflexivity;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -43,16 +45,26 @@ public class Reflex {
 			}
 			print.println("{");
 			Field[] fields = clazz.getDeclaredFields();
+			print.println();
 			if(fields != null && fields.length != 0) {
-				print.println();
 				for(Field f : fields) {
 					print.print(Modifier.toString(f.getModifiers()));
 					print.print(" ");
 					print.print(f.getType().getCanonicalName());
 					print.print(" ");
 					print.print(f.getName());
-					print.println();
+					print.println(";");
 				}
+			}
+			Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+			if(constructors!=null && constructors.length != 0) {
+				print.print(Arrays.asList(constructors).stream().map(c->c.toString()).collect(Collectors.joining(";\n")));
+				print.println(";\n");
+			}
+			Method[] methods = clazz.getDeclaredMethods();
+			if(methods!=null && methods.length != 0) {
+				print.print(Arrays.asList(methods).stream().map(m->m.toString()).collect(Collectors.joining(";\n")));
+				print.println(";");
 			}
 			print.print("}");
 		} catch (ClassNotFoundException e) {
